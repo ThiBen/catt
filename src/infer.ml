@@ -6,9 +6,9 @@ open PS
 open Unify
 
 
-(*let rec print_vars l = match l with
+let rec print_vars l = match l with
   |[] -> ";"
-  |t::q -> Printf.sprintf "%s %s" (string_of_var t) (print_vars q)*)
+  |t::q -> Printf.sprintf "%s %s" (string_of_var t) (print_vars q)
                                             
 (** Type inference *)
 let rec type_inference e env =
@@ -19,7 +19,7 @@ let rec type_inference e env =
   |Coh (c,u) -> let env = checkT u (Env.add_rec env (PS.ctx_of_ps c)) in
                 (*debug "ps_vars : %s" (print_vars (ps_vars c));
                 debug "free_vars : %s" (print_vars (free_vars u));*)
-                if List.included (free_vars u) (ps_vars c) then (u,env)
+                if List.included (ps_vars c) (free_vars u) then (u,env)
                 (** TODO : write the second condition *)
                 else error "not algebraic" 
   |Sub(t,s) -> begin match t.desc with
