@@ -1,6 +1,6 @@
 open Common
 open Syntax
-open Env
+open Ctx
        
 module PS = struct
   type t = Syntax.ps
@@ -36,11 +36,11 @@ module PS = struct
       |_,_ -> error "application of a coherence must instantiate all the variables"
     in aux ps (List.rev l)
 
-  let rec env_of_ps ps  =
+  let rec ctx_of_ps ps  =
     match ps with
-    |PNil (x,t) -> Env.add [] x t
-    |PCons (ps,(x,t),(y,u)) -> Env.add (Env.add (env_of_ps ps) x t) y u
-    |PDrop ps -> env_of_ps ps
+    |PNil (x,t) -> Ctx.add [] x t
+    |PCons (ps,(x,t),(y,u)) -> Ctx.add (Ctx.add (ctx_of_ps ps) x t) y u
+    |PDrop ps -> ctx_of_ps ps
 
   (** Dangling variable. *)
   let rec marker ps =

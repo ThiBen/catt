@@ -1,4 +1,4 @@
-coh id (x : *) : *|x -> x.
+coh id (x : *) : * | x -> x.
 coh idd (x : *) (y : *) (f : * | x -> y) : * | x -> y | f -> f.
 coh iddd (x : *) (y : *) (f : * | x -> y) (g : * | x -> y) (a : * | x -> y | f -> g ) : * | x -> y | f -> g | a -> a.
 

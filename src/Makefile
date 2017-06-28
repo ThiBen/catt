@@ -1,4 +1,4 @@
-SOURCES =  stdlib.ml common.ml syntax.ml env.ml pS.ml infer.ml command.ml parser.mly lexer.mll prover.ml catt.ml
+SOURCES =  stdlib.ml common.ml syntax.ml ctx.ml pS.ml unify.ml env.ml infer.ml command.ml parser.mly lexer.mll prover.ml catt.ml
 RESULT = catt
 ANNOTATE = true
 

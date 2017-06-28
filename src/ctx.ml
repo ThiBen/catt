@@ -4,26 +4,31 @@ open Syntax
 module Ctx = struct
   type t = (var * (expr option * expr)) list
 
-  let rec string_of_env (env:t) =
-    match env with
-    |(x,(Some e, t))::env -> (string_of_env env)^ Printf. sprintf "%s = %s : %s \n" (string_of_var x) (to_string e) (to_string t)
-    |(x,(None, t))::env -> (string_of_env env) ^ Printf.sprintf "%s : %s \n" (string_of_var x) (to_string t)
+  let rec string_of_ctx ctx =
+    match ctx with
+    |(x,(Some e, t))::ctx -> (string_of_ctx ctx)^ Printf. sprintf "%s = %s : %s \n" (string_of_var x) (to_string e) (to_string t)
+    |(x,(None, t))::ctx -> (string_of_ctx ctx) ^ Printf.sprintf "%s : %s \n" (string_of_var x) (to_string t)
     |[] -> ""
 
-  let to_string = string_of_env
+  let to_string = string_of_ctx
 
-  let add (env:t) x ?value t : t = (x,(value,t))::env                      
-                    
-  let ty_var x env =
+  let add (ctx:t) x ?value t : t = (x,(value,t))::ctx                      
+
+  let rec add_rec (ctx1: t) (ctx2: t) : t =
+    match ctx2 with
+    |[] -> ctx1 
+    |(x,(Some a,b))::ctx2 -> add_rec (add ctx1 x ~value:a b) ctx2
+    |(x,(None, b))::ctx2 -> add_rec (add ctx1 x b) ctx2
+
+  let ty_var x (ctx:t) =
     try
-      snd (List.assoc x env)
+      snd (List.assoc x ctx)
     with
       Not_found -> error "unknown identifier %s" (string_of_var x) 
 
-  let val_var x env =
+  let val_var x (ctx:t) =
     try
-      fst (List.assoc x env)
+      fst (List.assoc x ctx)
     with
       Not_found -> error "unknown identifier %s" (string_of_var x) 
-  let ext x ?value t (env:t) = (x,(value,t))::env                                           
 end

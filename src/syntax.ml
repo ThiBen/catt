@@ -7,8 +7,8 @@ let abbrev_mode = false
 (** Syntax of expressions *)
 type var =
   |Name of string
-  |New of string*int
-                   
+  |New of string * int
+                    
 type expr =
   {
     desc : desc;
@@ -17,7 +17,7 @@ type expr =
   }
 and desc =
   |Var of var
-  |Evar of var
+  |Evar of int                                                                    
   |Obj
   |Arr of expr * expr * expr
   |Coh of ps * expr
@@ -25,7 +25,7 @@ and desc =
   |Badsub of expr * var list
 and ps =
   |PNil of (var * expr)
-  |PCons of ps* (var * expr) * (var * expr)
+  |PCons of ps * (var * expr) * (var * expr)
   |PDrop of ps
 and sub = (var * expr) list
 
@@ -60,6 +60,25 @@ and ps_vars ps =
   |PCons(ps,(x1,t1),(x2,t2)) -> x1::x2::(ps_vars ps)
   |PDrop ps -> ps_vars ps
 
+let rec evars_of e =
+  match e.desc with
+  |Var _ -> []
+  |Evar i -> i::[]
+  |Obj -> []
+  |Arr (t,u,v) -> List.union (List.union (evars_of t)(evars_of u)) (evars_of v)
+  |Coh (ps,u) -> List.union (ps_evars_of ps) (evars_of u)
+  |Sub (u,s) -> List.union (evars_of u) (sub_evars_of s)
+and ps_evars_of ps =
+  match ps with
+  |PNil (x,t) -> evars_of t
+  |PCons (ps,(x1,t1),(x2,t2)) -> List.union (List.union (evars_of t1) (evars_of t2)) (ps_evars_of ps)
+  |PDrop ps -> ps_evars_of ps
+and sub_evars_of s =
+  match s with
+  |[] -> []
+  |(x,t)::q -> List.union (evars_of t) (sub_evars_of q)
+
+                          
 (** Printing of an expression *)                     
 let string_of_var = function
   |Name s -> s
